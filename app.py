@@ -66,7 +66,7 @@ if calcular and ticker.strip():
 
             # Inicializa el servicio (requiere tu token en los secretos de Streamlit Cloud)
             service = QiskitRuntimeService(token=st.secrets["9095208ccef470cb0a797f771162c63cceba3be91205776bd8f4bef34d57fded35321dc8327ff5ed21903b1992cf5a0959c18407a3a81d456e7574aa0e770746"])
-            backend = service.least_busy(operational=False, simulator=True)
+            backend = service.least_busy(operational=True, simulator=True)
             estimator = Estimator(backend=backend)
             estimator.options.resilience_level = 1
             estimator.options.default_shots = 1024
