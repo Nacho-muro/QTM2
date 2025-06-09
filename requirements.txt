@@ -1,0 +1,5 @@
+streamlit
+yfinance
+qiskit
+qiskit-ibm-runtime
+numpy
