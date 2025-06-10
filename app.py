@@ -53,7 +53,6 @@ if calcular and ticker.strip():
         if per is None or eps is None:
             st.warning("No hay suficientes datos financieros para optimizar cuánticamente esta empresa.")
         else:
-            # Verifica que per y eps sean numéricos y no None
             try:
                 per = float(per)
                 eps = float(eps)
@@ -61,12 +60,10 @@ if calcular and ticker.strip():
                 st.error("Error al convertir PER o EPS a número. Verifica los datos.")
                 st.stop()
 
-            # Normaliza los valores
             per_norm = min(max(per, 0), 100) / 100 * np.pi
             eps_norm = min(max(eps, 0), 10) / 10 * np.pi
             theta = per_norm + eps_norm
 
-            # Inicializa el servicio IBM Quantum
             try:
                 service = QiskitRuntimeService(
                     channel="ibm_quantum",
@@ -76,7 +73,6 @@ if calcular and ticker.strip():
                 st.error(f"Error al inicializar el servicio IBM Quantum: {e}")
                 st.stop()
 
-            # Mostrar y comprobar disponibilidad de los backends físicos
             st.write("Backends físicos disponibles y su estado:")
             backends_disponibles = []
             for backend in service.backends(simulator=False):
@@ -89,20 +85,15 @@ if calcular and ticker.strip():
                 st.error("No hay backends físicos operativos en este momento. Intenta más tarde.")
                 st.stop()
 
-            # Selecciona el primer backend físico disponible
             backend = backends_disponibles[0]
             num_qubits = backend.configuration().num_qubits
-
-            # Elige el último qubit físico para evitar conflictos de mapeo
             physical_qubit = num_qubits - 1
 
-            # Circuito cuántico SOLO con 1 qubit lógico, SOLO puertas nativas, SIN medidas
             qc = QuantumCircuit(1)
             qc.sx(0)
             qc.rz(theta, 0)
             qc.sx(0)
 
-            # Transpila el circuito para que el qubit lógico 0 vaya al físico seleccionado
             qc = transpile(
                 qc,
                 backend=backend,
@@ -110,7 +101,6 @@ if calcular and ticker.strip():
                 optimization_level=3
             )
 
-            # Observable: Z en el qubit físico seleccionado, I en los demás
             observable_str = "I" * physical_qubit + "Z" + "I" * (num_qubits - physical_qubit - 1)
             observable = SparsePauliOp(observable_str)
 
@@ -121,10 +111,10 @@ if calcular and ticker.strip():
                 estimator.options.resilience_level = 1
                 estimator.options.default_shots = 1024
 
-                # CORRECTO: lista de tuplas (circuito, observable, parámetros)
                 job = estimator.run([(qc, observable, [])])
                 result = job.result()
-                valor_cuantico = result[0].data.evs[0]  # ← ACCESO CORRECTO
+                # Acceso correcto a la estructura de resultados
+                valor_cuantico = result[0].data.evs[0]
 
             st.success(f"Resultado cuántico (valor esperado): {valor_cuantico:.3f}")
             if valor_cuantico > 0:
