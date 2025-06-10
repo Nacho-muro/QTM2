@@ -72,7 +72,7 @@ if calcular and ticker.strip():
             )
             # Lista y muestra los nombres de los backends disponibles
         for backend in service.backends():
-        print(backend.name)
+            print(backend.name)
     
             backend = service.backend("ibmq_qasm_simulator")
             estimator = Estimator(backend=backend)
