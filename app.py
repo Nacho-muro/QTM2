@@ -104,14 +104,12 @@ if calcular and ticker.strip():
             st.info(f"Ejecutando en {backend.name} sobre el qubit físico {physical_qubit}...")
 
             with Session(backend=backend) as session:
-                estimator = Estimator(mode=session)  # <--- CORREGIDO
+                estimator = Estimator(mode=session)
                 estimator.options.resilience_level = 1
                 estimator.options.default_shots = 1024
 
-                job = estimator.run(
-                    circuits=[qc],
-                    observables=[observable]
-                )
+                # LLAMADA CORRECTA SIN ARGUMENTOS NOMBRADOS
+                job = estimator.run([qc], [observable])
                 result = job.result()
                 valor_cuantico = result.values[0]
 
