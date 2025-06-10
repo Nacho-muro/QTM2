@@ -79,7 +79,7 @@ if calcular and ticker.strip():
             backend = service.backend("ibm_brisbane")
 
             with Session(backend=backend) as session:
-                estimator = Estimator(session=session)
+                estimator = Estimator(mode=session)
                 estimator.options.resilience_level = 1
                 estimator.options.default_shots = 1024
 
