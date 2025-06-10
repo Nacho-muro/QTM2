@@ -58,12 +58,12 @@ if calcular and ticker.strip():
             eps_norm = min(max(eps, 0), 10) / 10 * np.pi
             theta = per_norm + eps_norm
 
-            # Circuito cuántico solo con puertas nativas
-            qc = QuantumCircuit(1)
+            # Circuito cuántico solo con puertas nativas y 1 qubit
+            qc = QuantumCircuit(1, 1)
             qc.sx(0)
             qc.rz(theta, 0)
             qc.sx(0)
-            qc.measure_all()
+            qc.measure(0, 0)
 
             st.info("Enviando datos a IBM Quantum, espera unos segundos...")
 
@@ -82,12 +82,14 @@ if calcular and ticker.strip():
             # Transpila el circuito para el backend físico
             qc = transpile(qc, backend=backend)
 
+            observable = "Z"
+
             with Session(backend=backend) as session:
                 estimator = Estimator(mode=session)
                 estimator.options.resilience_level = 1
                 estimator.options.default_shots = 1024
 
-                job = estimator.run([(qc, "Z", [[]])])
+                job = estimator.run([(qc, observable, [[]])])
                 result = job.result()
                 valor_cuantico = result.data.evs[0]
 
