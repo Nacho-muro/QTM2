@@ -2,7 +2,7 @@ import streamlit as st
 import yfinance as yf
 import numpy as np
 from qiskit import QuantumCircuit
-from qiskit_ibm_runtime import QiskitRuntimeService, Estimator
+from qiskit_ibm_runtime import QiskitRuntimeService, Estimator, Session
 
 # Explicaciones de algoritmos cuánticos
 EXPLICACIONES = {
@@ -75,16 +75,17 @@ if calcular and ticker.strip():
             for backend in service.backends():
                 st.write(backend.name)
 
-            # Cambia "simulator_statevector" por un backend que veas en la lista si quieres
+            # Usa uno de los backends disponibles, por ejemplo "ibm_brisbane"
             backend = service.backend("ibm_brisbane")
 
-            estimator = Estimator(backend=backend)
-            estimator.options.resilience_level = 1
-            estimator.options.default_shots = 1024
+            with Session(service=service, backend=backend) as session:
+                estimator = Estimator(session=session)
+                estimator.options.resilience_level = 1
+                estimator.options.default_shots = 1024
 
-            job = estimator.run(circuits=[qc], observables=["Z"])
-            result = job.result()
-            valor_cuantico = result.values[0]
+                job = estimator.run(circuits=[qc], observables=["Z"])
+                result = job.result()
+                valor_cuantico = result.values[0]
 
             st.success(f"Resultado cuántico (valor esperado): {valor_cuantico:.3f}")
             if valor_cuantico > 0:
