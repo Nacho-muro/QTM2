@@ -1,6 +1,7 @@
 import streamlit as st
 import yfinance as yf
 import numpy as np
+from qiskit import QuantumCircuit
 from qiskit_ibm_runtime import QiskitRuntimeService, Estimator
 
 # Explicaciones de algoritmos cuánticos
@@ -57,33 +58,29 @@ if calcular and ticker.strip():
             eps_norm = min(max(eps, 0), 10) / 10 * np.pi
 
             # Circuito cuántico de ejemplo
-            from qiskit import QuantumCircuit
             qc = QuantumCircuit(1)
             qc.ry(per_norm + eps_norm, 0)
             qc.measure_all()
 
             st.info("Enviando datos a IBM Quantum, espera unos segundos...")
 
-            # Inicializa el servicio (requiere tu token en los secretos de Streamlit Cloud)
-           from qiskit_ibm_runtime import QiskitRuntimeService, Estimator
-        
-        # Conexión recomendada (nuevo IBM Quantum Platform)
-    service = QiskitRuntimeService(
-        channel="ibm_quantum",
-        token=st.secrets["IBM_QUANTUM_TOKEN"]
-    )
-    
-    # Muestra los backends disponibles en tu cuenta en la web
-st.write("Backends disponibles:")
-for backend in service.backends():
-    st.write(backend.name)
-    
-    # Elige un backend simulador de la lista que aparece (por ejemplo, 'simulator_statevector')
-backend = service.backend("simulator_statevector")  # Cambia el nombre si ves otro disponible
+            # Inicializa el servicio IBM Quantum con token y canal
+            service = QiskitRuntimeService(
+                channel="ibm_quantum",
+                token=st.secrets["IBM_QUANTUM_TOKEN"]
+            )
 
-estimator = Estimator(backend=backend)
-estimator.options.resilience_level = 1
-estimator.options.default_shots = 1024
+            # Muestra los backends disponibles para tu cuenta en la web
+            st.write("Backends disponibles:")
+            for backend in service.backends():
+                st.write(backend.name)
+
+            # Cambia "simulator_statevector" por un backend que veas en la lista si quieres
+            backend = service.backend("simulator_statevector")
+
+            estimator = Estimator(backend=backend)
+            estimator.options.resilience_level = 1
+            estimator.options.default_shots = 1024
 
             job = estimator.run(circuits=[qc], observables=["Z"])
             result = job.result()
