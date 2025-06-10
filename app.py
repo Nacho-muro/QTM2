@@ -66,28 +66,24 @@ if calcular and ticker.strip():
 
             # Inicializa el servicio (requiere tu token en los secretos de Streamlit Cloud)
            from qiskit_ibm_runtime import QiskitRuntimeService, Estimator
-
-# Conexión recomendada (nuevo IBM Quantum Platform)
-service = QiskitRuntimeService(channel="ibm_quantum", token=st.secrets["IBM_QUANTUM_TOKEN"])
-
-# Muestra los backends disponibles en tu cuenta
-backends = service.backends()
+        
+        # Conexión recomendada (nuevo IBM Quantum Platform)
+    service = QiskitRuntimeService(
+        channel="ibm_quantum",
+        token=st.secrets["IBM_QUANTUM_TOKEN"]
+    )
+    
+    # Muestra los backends disponibles en tu cuenta en la web
 st.write("Backends disponibles:")
-for backend in backends:
+for backend in service.backends():
     st.write(backend.name)
-
-# Elige un backend de la lista que sea simulador (por ejemplo, 'simulator_statevector' o el que veas disponible)
-# Cambia el nombre aquí según lo que aparezca en la lista
-backend = service.backend("simulator_statevector")  # O el nombre que veas en la lista
+    
+    # Elige un backend simulador de la lista que aparece (por ejemplo, 'simulator_statevector')
+backend = service.backend("simulator_statevector")  # Cambia el nombre si ves otro disponible
 
 estimator = Estimator(backend=backend)
 estimator.options.resilience_level = 1
 estimator.options.default_shots = 1024
-
-job = estimator.run(circuits=[qc], observables=["Z"])
-result = job.result()
-valor_cuantico = result.values[0]
-
 
             job = estimator.run(circuits=[qc], observables=["Z"])
             result = job.result()
