@@ -4,7 +4,6 @@ import numpy as np
 from qiskit import QuantumCircuit, transpile
 from qiskit_ibm_runtime import QiskitRuntimeService, Estimator, Session
 
-# Explicaciones de algoritmos cuánticos
 EXPLICACIONES = {
     "Quantum Monte Carlo":
         "Este algoritmo permite simular escenarios de mercado y estimar el valor futuro de la empresa bajo diferentes condiciones económicas.",
@@ -53,12 +52,11 @@ if calcular and ticker.strip():
         if per is None or eps is None:
             st.warning("No hay suficientes datos financieros para optimizar cuánticamente esta empresa.")
         else:
-            # Normaliza PER y EPS para el circuito cuántico
             per_norm = min(max(per, 0), 100) / 100 * np.pi
             eps_norm = min(max(eps, 0), 10) / 10 * np.pi
             theta = per_norm + eps_norm
 
-            # Circuito cuántico solo con puertas nativas y 1 qubit
+            # Circuito cuántico solo con puertas nativas y 1 qubit y 1 clásico
             qc = QuantumCircuit(1, 1)
             qc.sx(0)
             qc.rz(theta, 0)
@@ -67,7 +65,6 @@ if calcular and ticker.strip():
 
             st.info("Enviando datos a IBM Quantum, espera unos segundos...")
 
-            # Inicializa el servicio IBM Quantum con token y canal
             service = QiskitRuntimeService(
                 channel="ibm_quantum",
                 token=st.secrets["IBM_QUANTUM_TOKEN"]
@@ -79,8 +76,8 @@ if calcular and ticker.strip():
 
             backend = service.backend("ibm_brisbane")
 
-            # Transpila el circuito para el backend físico
-            qc = transpile(qc, backend=backend)
+            # Transpila el circuito para el backend físico, fijando el layout inicial
+            qc = transpile(qc, backend=backend, initial_layout=[0])
 
             observable = "Z"
 
