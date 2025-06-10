@@ -103,14 +103,19 @@ if calcular and ticker.strip():
 
             st.info(f"Ejecutando en {backend.name} sobre el qubit físico {physical_qubit}...")
 
+            # --- CORRECCIÓN PRINCIPAL ---
             with Session(backend=backend) as session:
-                estimator = Estimator(mode=session)
+                estimator = Estimator(session=session)
                 estimator.options.resilience_level = 1
                 estimator.options.default_shots = 1024
 
-                job = estimator.run([(qc, observable, [[]])])
+                # Llamada correcta y moderna al Estimator
+                job = estimator.run(
+                    circuits=[qc],
+                    observables=[observable]
+                )
                 result = job.result()
-                valor_cuantico = result.values[0]  # ← CORREGIDO
+                valor_cuantico = result.values[0]
 
             st.success(f"Resultado cuántico (valor esperado): {valor_cuantico:.3f}")
             if valor_cuantico > 0:
