@@ -83,7 +83,7 @@ if calcular and ticker.strip():
                 estimator.options.resilience_level = 1
                 estimator.options.default_shots = 1024
 
-                job = estimator.run(circuits=[qc], observables=["Z"])
+                job = estimator.run([(qc, "Z", [[]])])
                 result = job.result()
                 valor_cuantico = result.values[0]
 
