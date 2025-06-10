@@ -65,7 +65,7 @@ if calcular and ticker.strip():
             st.info("Enviando datos a IBM Quantum, espera unos segundos...")
 
             # Inicializa el servicio (requiere tu token en los secretos de Streamlit Cloud)
-            service = QiskitRuntimeService(channel="ibm_quantum", token=st.secrets["IBM_QUANTUM_TOKEN"])
+            service = QiskitRuntimeService(channel="ibm_quantum",token=st.secrets["IBM_QUANTUM_TOKEN"])
             backend = service.backend("ibmq_qasm_simulator")
             estimator = Estimator(backend=backend)
             estimator.options.resilience_level = 1
