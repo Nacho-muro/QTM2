@@ -56,12 +56,11 @@ if calcular and ticker.strip():
             eps_norm = min(max(eps, 0), 10) / 10 * np.pi
             theta = per_norm + eps_norm
 
-            # Circuito cuántico con 1 qubit y 1 clásico
-            qc = QuantumCircuit(1, 1)
+            # Circuito cuántico solo con puertas nativas, sin registros clásicos ni medidas
+            qc = QuantumCircuit(1)
             qc.sx(0)
             qc.rz(theta, 0)
             qc.sx(0)
-            qc.measure(0, 0)
 
             st.info("Enviando datos a IBM Quantum, espera unos segundos...")
 
