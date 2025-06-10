@@ -66,16 +66,14 @@ if calcular and ticker.strip():
 
             # Inicializa el servicio (requiere tu token en los secretos de Streamlit Cloud)
             from qiskit_ibm_runtime import QiskitRuntimeService
-
-service = QiskitRuntimeService(
-    channel="ibm_quantum",
-    token=st.secrets["IBM_QUANTUM_TOKEN"]
-)
-
-# Lista y muestra los nombres de los backends disponibles
-for backend in service.backends():
-    print(backend.name)
-
+            service = QiskitRuntimeService(
+                channel="ibm_quantum",
+                token=st.secrets["IBM_QUANTUM_TOKEN"]
+            )
+            # Lista y muestra los nombres de los backends disponibles
+        for backend in service.backends():
+        print(backend.name)
+    
             backend = service.backend("ibmq_qasm_simulator")
             estimator = Estimator(backend=backend)
             estimator.options.resilience_level = 1
