@@ -3,6 +3,7 @@ import yfinance as yf
 import numpy as np
 from qiskit import QuantumCircuit, transpile
 from qiskit_ibm_runtime import QiskitRuntimeService, Estimator, Session
+from qiskit.quantum_info import SparsePauliOp
 
 EXPLICACIONES = {
     "Quantum Monte Carlo":
@@ -56,14 +57,7 @@ if calcular and ticker.strip():
             eps_norm = min(max(eps, 0), 10) / 10 * np.pi
             theta = per_norm + eps_norm
 
-            # Circuito cuántico SOLO con 1 qubit, SOLO puertas nativas, SIN medidas
-            qc = QuantumCircuit(1)
-            qc.sx(0)
-            qc.rz(theta, 0)
-            qc.sx(0)
-
-            st.info("Enviando datos a IBM Quantum, espera unos segundos...")
-
+            # Inicializa el servicio IBM Quantum
             service = QiskitRuntimeService(
                 channel="ibm_quantum",
                 token=st.secrets["IBM_QUANTUM_TOKEN"]
@@ -84,16 +78,30 @@ if calcular and ticker.strip():
 
             # Selecciona el primer backend físico disponible
             backend = backends_disponibles[0]
+            num_qubits = backend.configuration().num_qubits
 
-            # Mapea el qubit lógico 0 al qubit físico 0 del backend
+            # Elige el último qubit físico para evitar conflictos de mapeo
+            physical_qubit = num_qubits - 1
+
+            # Circuito cuántico SOLO con 1 qubit lógico, SOLO puertas nativas, SIN medidas
+            qc = QuantumCircuit(1)
+            qc.sx(0)
+            qc.rz(theta, 0)
+            qc.sx(0)
+
+            # Transpila el circuito para que el qubit lógico 0 vaya al físico seleccionado
             qc = transpile(
                 qc,
                 backend=backend,
-                initial_layout=[0],  # Mapeo explícito
+                initial_layout=[physical_qubit],
                 optimization_level=3
             )
 
-            observable = "Z"  # Observable para el qubit 0
+            # Observable: Z en el qubit físico seleccionado, I en los demás
+            observable_str = "I" * physical_qubit + "Z" + "I" * (num_qubits - physical_qubit - 1)
+            observable = SparsePauliOp(observable_str)
+
+            st.info(f"Ejecutando en {backend.name} sobre el qubit físico {physical_qubit}...")
 
             with Session(backend=backend) as session:
                 estimator = Estimator(mode=session)
