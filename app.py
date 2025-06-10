@@ -69,11 +69,21 @@ if calcular and ticker.strip():
                 token=st.secrets["IBM_QUANTUM_TOKEN"]
             )
 
-            st.write("Backends disponibles:")
+            # Mostrar y comprobar disponibilidad de los backends
+            st.write("Backends disponibles y su estado:")
+            backends_disponibles = []
             for backend in service.backends():
-                st.write(backend.name)
+                status = backend.status()
+                st.write(f"{backend.name}: {'Disponible' if status.operational and status.status_msg == 'active' else status.status_msg}")
+                if status.operational and status.status_msg == 'active':
+                    backends_disponibles.append(backend)
 
-            backend = service.backend("ibm_brisbane")
+            if not backends_disponibles:
+                st.error("No hay backends operativos en este momento. Intenta más tarde.")
+                st.stop()
+
+            # Selecciona el primer backend disponible
+            backend = backends_disponibles[0]
 
             # Transpila SOLO para el primer qubit físico
             qc = transpile(qc, backend=backend, initial_layout=[0])
