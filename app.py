@@ -76,7 +76,7 @@ if calcular and ticker.strip():
                 st.write(backend.name)
 
             # Cambia "simulator_statevector" por un backend que veas en la lista si quieres
-            backend = service.backend("simulator_statevector")
+            backend = service.backend("ibm_brisbane")
 
             estimator = Estimator(backend=backend)
             estimator.options.resilience_level = 1
