@@ -53,15 +53,28 @@ if calcular and ticker.strip():
         if per is None or eps is None:
             st.warning("No hay suficientes datos financieros para optimizar cuánticamente esta empresa.")
         else:
+            # Verifica que per y eps sean numéricos y no None
+            try:
+                per = float(per)
+                eps = float(eps)
+            except (TypeError, ValueError):
+                st.error("Error al convertir PER o EPS a número. Verifica los datos.")
+                st.stop()
+
+            # Normaliza los valores
             per_norm = min(max(per, 0), 100) / 100 * np.pi
             eps_norm = min(max(eps, 0), 10) / 10 * np.pi
             theta = per_norm + eps_norm
 
             # Inicializa el servicio IBM Quantum
-            service = QiskitRuntimeService(
-                channel="ibm_quantum",
-                token=st.secrets["IBM_QUANTUM_TOKEN"]
-            )
+            try:
+                service = QiskitRuntimeService(
+                    channel="ibm_quantum",
+                    token=st.secrets["IBM_QUANTUM_TOKEN"]
+                )
+            except Exception as e:
+                st.error(f"Error al inicializar el servicio IBM Quantum: {e}")
+                st.stop()
 
             # Mostrar y comprobar disponibilidad de los backends físicos
             st.write("Backends físicos disponibles y su estado:")
