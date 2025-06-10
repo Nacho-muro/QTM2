@@ -56,7 +56,7 @@ if calcular and ticker.strip():
             eps_norm = min(max(eps, 0), 10) / 10 * np.pi
             theta = per_norm + eps_norm
 
-            # Circuito cuántico SOLO con 1 qubit, SIN registros clásicos NI medidas
+            # Circuito cuántico SOLO con 1 qubit, SOLO puertas nativas, SIN medidas
             qc = QuantumCircuit(1)
             qc.sx(0)
             qc.rz(theta, 0)
@@ -69,26 +69,31 @@ if calcular and ticker.strip():
                 token=st.secrets["IBM_QUANTUM_TOKEN"]
             )
 
-            # Mostrar y comprobar disponibilidad de los backends
-            st.write("Backends disponibles y su estado:")
+            # Mostrar y comprobar disponibilidad de los backends físicos
+            st.write("Backends físicos disponibles y su estado:")
             backends_disponibles = []
-            for backend in service.backends():
+            for backend in service.backends(simulator=False):
                 status = backend.status()
                 st.write(f"{backend.name}: {'Disponible' if status.operational and status.status_msg == 'active' else status.status_msg}")
                 if status.operational and status.status_msg == 'active':
                     backends_disponibles.append(backend)
 
             if not backends_disponibles:
-                st.error("No hay backends operativos en este momento. Intenta más tarde.")
+                st.error("No hay backends físicos operativos en este momento. Intenta más tarde.")
                 st.stop()
 
-            # Selecciona el primer backend disponible
+            # Selecciona el primer backend físico disponible
             backend = backends_disponibles[0]
 
-            # Transpila SOLO para el primer qubit físico
-            qc = transpile(qc, backend=backend, initial_layout=[0])
+            # Mapea el qubit lógico 0 al qubit físico 0 del backend
+            qc = transpile(
+                qc,
+                backend=backend,
+                initial_layout=[0],  # Mapeo explícito
+                optimization_level=3
+            )
 
-            observable = "Z"
+            observable = "Z"  # Observable para el qubit 0
 
             with Session(backend=backend) as session:
                 estimator = Estimator(mode=session)
