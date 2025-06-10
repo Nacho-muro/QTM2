@@ -1,6 +1,7 @@
 import streamlit as st
 import yfinance as yf
 import numpy as np
+import matplotlib.pyplot as plt
 from qiskit import QuantumCircuit, transpile
 from qiskit_ibm_runtime import QiskitRuntimeService, Estimator, Session
 from qiskit.quantum_info import SparsePauliOp
@@ -113,7 +114,6 @@ if calcular and ticker.strip():
 
                 job = estimator.run([(qc, observable, [])])
                 result = job.result()
-                # Acceso correcto a la estructura de resultados
                 valor_cuantico = result[0].data.evs[0]
 
             st.success(f"Resultado cuántico (valor esperado): {valor_cuantico:.3f}")
@@ -121,6 +121,37 @@ if calcular and ticker.strip():
                 st.write("Interpretación: El análisis cuántico sugiere una perspectiva positiva para la empresa.")
             else:
                 st.write("Interpretación: El análisis cuántico sugiere cautela o perspectiva negativa para la empresa.")
+
+            st.markdown("---")
+
+            # Gráfico de precio histórico
+            st.subheader("Precio histórico")
+            hist = empresa.history(period="1y")
+            if not hist.empty:
+                fig, ax = plt.subplots()
+                ax.plot(hist.index, hist['Close'])
+                ax.set_title(f"Precio histórico de {nombre} ({ticker})")
+                ax.set_ylabel("Precio (USD)")
+                st.pyplot(fig)
+            else:
+                st.warning("No hay datos históricos disponibles.")
+
+            # Comparativa con el sector (ejemplo manual)
+            st.subheader("Comparativa con el sector (ejemplo)")
+            st.write("AAPL: PER=30, EPS=6.5 (valores de ejemplo)")
+            st.write("MSFT: PER=35, EPS=9.2 (valores de ejemplo)")
+            st.write("GOOGL: PER=28, EPS=5.8 (valores de ejemplo)")
+            st.write("Estos valores son solo ilustrativos. Puedes automatizar la comparativa con una API o base de datos.")
+
+            # Simulación de escenarios
+            st.subheader("Simulación de escenarios")
+            with st.expander("Simula diferentes valores de PER y EPS"):
+                per_sim = st.slider("PER simulado", 0.0, 100.0, float(per))
+                eps_sim = st.slider("EPS simulado", 0.0, 20.0, float(eps))
+                per_norm_sim = min(max(per_sim, 0), 100) / 100 * np.pi
+                eps_norm_sim = min(max(eps_sim, 0), 20) / 20 * np.pi
+                theta_sim = per_norm_sim + eps_norm_sim
+                st.write(f"Valor cuántico simulado: {np.sin(theta_sim):.3f} (solo como ejemplo)")
 
         st.markdown("---")
         st.write(EXPLICACIONES[algoritmo])
