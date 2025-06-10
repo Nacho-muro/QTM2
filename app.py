@@ -118,11 +118,9 @@ if calcular and ticker.strip():
 
             st.success(f"Resultado cuántico (valor esperado): {valor_cuantico:.3f}")
             if valor_cuantico > 0:
-                st.write("Interpretación: El análisis cuántico sugiere una perspectiva positiva para la empresa.")
+                st.write("**Interpretación:** El análisis cuántico sugiere una perspectiva positiva para la empresa.")
             else:
-                st.write("Interpretación: El análisis cuántico sugiere cautela o perspectiva negativa para la empresa.")
-
-            st.markdown("---")
+                st.write("**Interpretación:** El análisis cuántico sugiere cautela o perspectiva negativa para la empresa.")
 
             # Gráfico de precio histórico
             st.subheader("Precio histórico")
