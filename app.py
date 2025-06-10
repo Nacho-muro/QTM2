@@ -56,10 +56,13 @@ if calcular and ticker.strip():
             # Normaliza PER y EPS para el circuito cuántico
             per_norm = min(max(per, 0), 100) / 100 * np.pi
             eps_norm = min(max(eps, 0), 10) / 10 * np.pi
+            theta = per_norm + eps_norm
 
-            # Circuito cuántico de ejemplo
+            # Circuito cuántico solo con puertas nativas
             qc = QuantumCircuit(1)
-            qc.ry(per_norm + eps_norm, 0)
+            qc.sx(0)
+            qc.rz(theta, 0)
+            qc.sx(0)
             qc.measure_all()
 
             st.info("Enviando datos a IBM Quantum, espera unos segundos...")
@@ -70,12 +73,10 @@ if calcular and ticker.strip():
                 token=st.secrets["IBM_QUANTUM_TOKEN"]
             )
 
-            # Muestra los backends disponibles para tu cuenta en la web
             st.write("Backends disponibles:")
             for backend in service.backends():
                 st.write(backend.name)
 
-            # Usa uno de los backends disponibles, por ejemplo "ibm_brisbane"
             backend = service.backend("ibm_brisbane")
 
             # Transpila el circuito para el backend físico
