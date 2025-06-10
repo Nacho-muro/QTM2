@@ -111,7 +111,7 @@ if calcular and ticker.strip():
                 # CORRECTO: lista de tuplas (circuito, observable, parámetros)
                 job = estimator.run([(qc, observable, [])])
                 result = job.result()
-                valor_cuantico = result.values[0]
+                valor_cuantico = result[0].data.evs[0]  # ← ACCESO CORRECTO
 
             st.success(f"Resultado cuántico (valor esperado): {valor_cuantico:.3f}")
             if valor_cuantico > 0:
