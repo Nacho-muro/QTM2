@@ -108,8 +108,8 @@ if calcular and ticker.strip():
                 estimator.options.resilience_level = 1
                 estimator.options.default_shots = 1024
 
-                # LLAMADA CORRECTA SIN ARGUMENTOS NOMBRADOS
-                job = estimator.run([qc], [observable])
+                # CORRECTO: lista de tuplas (circuito, observable, parámetros)
+                job = estimator.run([(qc, observable, [])])
                 result = job.result()
                 valor_cuantico = result.values[0]
 
